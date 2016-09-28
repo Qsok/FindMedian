@@ -7,15 +7,15 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Main {
-    static ArrayList<Long> arrX = new ArrayList<Long>();
+public class FindMedian {
+    static ArrayList<Long> firstArr = new ArrayList<Long>();
     static ArrayList<Long> arrY = new ArrayList<Long>();
     static String errMsg = new String();
     static boolean arrUploaded = false;
 
     //запускает меню,сортирует введенные массивы и запускает и выводит данные алгоритма
     public static void main(String[] args) throws FileNotFoundException, NumberFormatException {
-        arrX.add(0l);//добавляем ноль в начало массива,для корректного определения четности в алгоритме
+        firstArr.add(0l);//добавляем ноль в начало массива,для корректного определения четности в алгоритме
         arrY.add(0l);
         boolean exit = false;
         Scanner sc = new Scanner(System.in);
@@ -41,14 +41,17 @@ public class Main {
             }
 
         }
-        quickSort(arrX, 0, arrX.size() - 1);
+        quickSort(firstArr, 0, firstArr.size() - 1);
         quickSort(arrY, 0, arrY.size() - 1);
-        for (int x = 1; x < arrX.size(); x++) {
-            System.out.println(arrX.get(x) + "    " + arrY.get(x));
+        for (int x = 1; x < firstArr.size(); x++) {
+            System.out.println(firstArr.get(x) + "    " + arrY.get(x));
         }
-        System.out.println("Median equals "+findMedian(arrX, arrY));
+        System.out.println("Median equals "+findMedian(firstArr, arrY));
         sc.close();
     }
+
+
+
     //меню чтения из файла
     static boolean readFromFile(Scanner sc) throws FileNotFoundException {
         File file;
@@ -94,7 +97,7 @@ public class Main {
                 s = in.readLine();
                 try {
                     for (String x : s.split(" "))
-                        arrX.add(Long.parseLong(x));
+                        firstArr.add(Long.parseLong(x));
                 } catch (NumberFormatException a) {
                 }
                 s = in.readLine();
@@ -107,17 +110,17 @@ public class Main {
                 in.close();
             }
         } catch (IOException e) {
-            arrX.clear();
+            firstArr.clear();
             arrY.clear();
             throw new RuntimeException(e);
         }
-        if (arrX.size() == arrY.size()) {
+        if (firstArr.size() == arrY.size()) {
             arrUploaded = true;
             System.out.println("Succesfull read from file");
             return true;
         } else {
             System.out.println("Unsuccessful read");
-            arrX.clear();
+            firstArr.clear();
             arrY.clear();
             return false;
         }
@@ -132,8 +135,8 @@ public class Main {
         try {
             size = sc.nextInt();
             System.out.println("Please enter first arrray");
-            while (arrX.size() < size + 1)
-                arrX.add(sc.nextLong());
+            while (firstArr.size() < size + 1)
+                firstArr.add(sc.nextLong());
             System.out.println("Please enter second arrray");
             while (arrY.size() < size + 1)
                 arrY.add(sc.nextLong());
@@ -151,38 +154,41 @@ public class Main {
     //первая часть алгоритма - сокращающает оба массива до размера 2, далее из этихъ четырех чисел создается массив и находится там медиана
     //описание алгоритма см.Документацию
     //возвращает медиану 2х массивов в double
-    static double findMedian(ArrayList<Long> X, ArrayList<Long> Y) {
-        int rightX = X.size() - 1, leftX = 1;//правая и левая граница массива Х
-        int midX = 0, midY;//медианы обрезаемых массивов
+    static double findMedian() {
+        int rightBorderFirstArr = firstArr.size() - 1;
+        int leftBorderFirstArr = 1;//правая и левая граница массива Х
+        int medianFirstArr, medianSecondArr;//медианы обрезаемых массивов
         long temp;
         double tempMedian, median = 0;
         //проверка на слишком маленький массив , длинной в один или ноль элементов
-        if (arrX.size() == 2) {
-            median = (double) (arrX.get(1) + arrY.get(1)) / 2;
+        if (firstArr.size() == 2) {
+            median = (double) (firstArr.get(1) + arrY.get(1)) / 2;
             return median;
         }
-        else if(arrX.size()==1)
+        else if(firstArr.size()==1)
             return 0;
-        while ((rightX - leftX) != 1) {
-            midX = (rightX + leftX) / 2;
-            midY = arrY.size() - midX;
-            temp = arrX.get(midX) + arrY.get(midY);
+        while ((rightBorderFirstArr - leftBorderFirstArr) != 1) {
+            medianFirstArr = (rightBorderFirstArr + leftBorderFirstArr) / 2;
+            medianSecondArr = arrY.size() - medianFirstArr;
+            temp = firstArr.get(medianFirstArr) + arrY.get(medianSecondArr);
             tempMedian = temp / 2;
-            if (arrX.get(midX) >= arrY.get(midY)) {
-                rightX = midX;
-                if (arrY.get(midY + 1) >= tempMedian && arrX.get(midX - 1) <= tempMedian) {
-                    return AccurateMedianChoice(arrX.get(midX - 1), arrX.get(midX), arrY.get(midY + 1), arrY.get(midY));
+            if (firstArr.get(medianFirstArr) >= arrY.get(medianSecondArr)) {
+                rightBorderFirstArr = medianFirstArr;
+                if (arrY.get(medianSecondArr + 1) >= tempMedian && firstArr.get(medianFirstArr - 1) <= tempMedian) {
+                    return AccurateMedianChoice(firstArr.get(medianFirstArr - 1), firstArr.get(medianFirstArr), arrY.get(medianSecondArr + 1), arrY.get(medianSecondArr));
                 }
-            } else if (arrX.get(midX) <= arrY.get(midY)) {
-                leftX = midX;
-                if (arrY.get(midY - 1) <= tempMedian && arrX.get(midX + 1) >= tempMedian) {
-                    return AccurateMedianChoice(arrX.get(midX + 1), arrX.get(midX), arrY.get(midY - 1), arrY.get(midY));
+            } else if (firstArr.get(medianFirstArr) <= arrY.get(medianSecondArr)) {
+                leftBorderFirstArr = medianFirstArr;
+                if (arrY.get(medianSecondArr - 1) <= tempMedian && firstArr.get(medianFirstArr + 1) >= tempMedian) {
+                    return AccurateMedianChoice(firstArr.get(medianFirstArr + 1), firstArr.get(medianFirstArr), arrY.get(medianSecondArr - 1), arrY.get(medianSecondArr));
                 }
             }
-
         }
+        return AccurateMedianChoice(firstArr.get(leftBorderFirstArr), firstArr.get(rightBorderFirstArr), arrY.get(arrY.size() - leftBorderFirstArr), arrY.get(arrY.size() - rightBorderFirstArr));
+    }
 
-        return AccurateMedianChoice(arrX.get(leftX), arrX.get(rightX), arrY.get(arrY.size() - leftX), arrY.get(arrY.size() - rightX));
+    static boolean checkIfArrTooSmall(){
+
     }
 
     //вторая часть алгоритма , точно выбирающая медиану объединенных массивов
@@ -203,23 +209,18 @@ public class Main {
     public static void quickSort(ArrayList<Long> arr, int low, int high) {
         if (arr == null || arr.size() == 0)
             return;
-
         if (low >= high)
             return;
-
         int middle = low + (high - low) / 2;
         long pivot = arr.get(middle);
-
         int i = low, j = high;
         while (i <= j) {
             while (arr.get(i) < pivot) {
                 i++;
             }
-
             while (arr.get(j) > pivot) {
                 j--;
             }
-
             if (i <= j) {
                 long temp = arr.get(i);
                 arr.set(i, arr.get(j));
@@ -228,8 +229,6 @@ public class Main {
                 j--;
             }
         }
-
-
         if (low < j)
             quickSort(arr, low, j);
 
